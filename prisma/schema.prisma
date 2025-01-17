@@ -1,0 +1,60 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Patient {
+  id          String     @id @default(cuid())
+  mrn         String     @unique
+  name        String
+  age         Int
+  gender      String
+  contactInfo String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  registries  Registry[]
+  relatives   Relative[]
+}
+
+model Disease {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  description String
+  registries  Registry[]
+}
+
+model Registry {
+  id          String    @id @default(cuid())
+  patient     Patient   @relation(fields: [patientId], references: [id])
+  patientId   String
+  disease     Disease   @relation(fields: [diseaseId], references: [id])
+  diseaseId   String
+  contacted   Boolean   @default(false)
+  contactDate DateTime?
+  registeredBy User     @relation("RegisteredBy", fields: [userId], references: [id])
+  userId      String
+  createdAt   DateTime  @default(now())
+}
+
+model Relative {
+  id             String   @id @default(cuid())
+  patient        Patient  @relation(fields: [patientId], references: [id])
+  patientId      String
+  relativeName   String
+  relation       String
+  relativeContact String
+  createdAt      DateTime @default(now())
+}
+
+model User {
+  id           String     @id @default(cuid())
+  username     String     @unique
+  role         String
+  passwordHash String
+  createdAt    DateTime   @default(now())
+  registries   Registry[] @relation("RegisteredBy")
+} 
