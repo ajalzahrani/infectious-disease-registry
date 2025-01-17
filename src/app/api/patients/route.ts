@@ -30,18 +30,53 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const json = await request.json();
-    const patient = await prisma.patient.create({
-      data: json,
-      include: {
-        registries: true,
-        relatives: true,
-      },
+    const { diseases, ...patientData } = json;
+
+    if (!diseases || !Array.isArray(diseases)) {
+      return NextResponse.json(
+        { error: "Diseases array is required" },
+        { status: 400 }
+      );
+    }
+
+    // Create the patient with registries in a transaction
+    const patient = await prisma.$transaction(async (tx) => {
+      // First create the patient
+      const newPatient = await tx.patient.create({
+        data: {
+          ...patientData,
+          registries: {
+            create: diseases.map((diseaseId: string) => ({
+              disease: {
+                connect: { id: diseaseId },
+              },
+              registeredBy: {
+                connect: { id: "1" },
+              },
+              contacted: false,
+            })),
+          },
+        },
+        include: {
+          registries: {
+            include: {
+              disease: true,
+              registeredBy: true,
+            },
+          },
+        },
+      });
+      return newPatient;
     });
+
     return NextResponse.json(patient);
   } catch (error) {
-    console.error("Error creating patient:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error occurred";
+    console.error("Error creating patient:", errorMessage);
+
     return NextResponse.json(
-      { error: "Error creating patient" },
+      { error: `Failed to create patient: ${errorMessage}` },
       { status: 500 }
     );
   }

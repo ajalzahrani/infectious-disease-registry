@@ -14,6 +14,11 @@ const sidebarNavItems = [
     icon: Home,
   },
   {
+    title: "Register Patient",
+    icon: FileText,
+    href: "/patients/register",
+  },
+  {
     title: "Patients",
     href: "/patients",
     icon: Users,
