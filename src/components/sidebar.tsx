@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Home, Users, FileText, Bell } from "lucide-react";
+import { Home, Users, FileText, Bell, Pill } from "lucide-react";
 import { use } from "react";
 
 const sidebarNavItems = [
@@ -27,6 +27,11 @@ const sidebarNavItems = [
     title: "Notifications",
     href: "/notifications",
     icon: Bell,
+  },
+  {
+    title: "Diseases",
+    href: "/diseases",
+    icon: Pill,
   },
 ];
 
