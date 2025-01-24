@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,32 +12,51 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DatePickerWithRange } from "@/components/date-range-picker";
-import { getDiseases } from "@/lib/data";
+import { useDiseases } from "@/hooks/use-diseases";
 
-interface Disease {
-  value: string;
-  label: string;
+interface RegistryFiltersProps {
+  onFilter: (filters: any) => void;
 }
 
-export async function RegistryFilters() {
-  const diseases = await getDiseases();
+export function RegistryFilters({ onFilter }: RegistryFiltersProps) {
+  const { diseases } = useDiseases();
+  const [filters, setFilters] = useState({
+    search: "",
+    disease: "",
+    status: "",
+    dateRange: {
+      from: undefined,
+      to: undefined,
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onFilter(filters);
+  };
 
   return (
-    <div className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <Label htmlFor="search">Search</Label>
-        <Input id="search" placeholder="Search by name or MRN" />
+        <Input
+          id="search"
+          placeholder="Search by name or MRN"
+          value={filters.search}
+          onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+        />
       </div>
       <div>
         <Label htmlFor="disease">Disease</Label>
-        <Select>
+        <Select
+          onValueChange={(value) => setFilters({ ...filters, disease: value })}>
           <SelectTrigger id="disease">
             <SelectValue placeholder="Select disease" />
           </SelectTrigger>
           <SelectContent>
-            {diseases.map((disease) => (
-              <SelectItem key={disease.value} value={disease.value}>
-                {disease.label}
+            {diseases?.map((disease) => (
+              <SelectItem key={disease.id} value={disease.id}>
+                {disease.name}
               </SelectItem>
             ))}
           </SelectContent>
@@ -56,7 +78,9 @@ export async function RegistryFilters() {
         <Label>Date Range</Label>
         <DatePickerWithRange />
       </div>
-      <Button className="w-full">Apply Filters</Button>
-    </div>
+      <Button type="submit" className="w-full">
+        Apply Filters
+      </Button>
+    </form>
   );
 }

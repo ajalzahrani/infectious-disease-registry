@@ -1,24 +1,34 @@
-import { RegistryList } from "@/components/registry-list";
-import { RegistryFilters } from "@/components/registry-filters";
-import { Suspense } from "react";
+import { prisma } from "@/lib/prisma";
+import { RegistryClientWrapper } from "@/components/registry-client-wrapper";
 
-export default function RegistryPage() {
+export default async function RegistryPage() {
+  // Fetch initial data (today's patients)
+  const today = new Date();
+  const patients = await prisma.patient.findMany({
+    include: {
+      registries: {
+        include: {
+          disease: true,
+          registeredBy: true,
+        },
+      },
+      relatives: true,
+    },
+    where: {
+      createdAt: {
+        gte: new Date(today.setHours(0, 0, 0, 0)),
+        lt: new Date(today.setHours(23, 59, 59, 999)),
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
   return (
     <div className="container mx-auto py-10">
       <h1 className="text-3xl font-bold mb-6">Registry</h1>
-      <p className="text-sm text-red-500 mb-6">
-        TODO: continue with the registry page
-      </p>
-      <div className="grid gap-6 md:grid-cols-[300px_1fr]">
-        <aside>
-          <RegistryFilters />
-        </aside>
-        <main>
-          <Suspense fallback={<div>Loading patients...</div>}>
-            <RegistryList />
-          </Suspense>
-        </main>
-      </div>
+      <RegistryClientWrapper initialPatients={patients} />
     </div>
   );
 }

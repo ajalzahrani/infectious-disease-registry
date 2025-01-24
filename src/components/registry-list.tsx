@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Table,
   TableBody,
@@ -9,74 +11,51 @@ import {
 import { Button } from "@/components/ui/button";
 import { Eye } from "lucide-react";
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
 
-export async function RegistryList() {
-  try {
-    const patients = await prisma.patient.findMany({
-      include: {
-        registries: {
-          include: {
-            disease: true,
-            registeredBy: true,
-          },
-        },
-        relatives: true,
-      },
-      where: {
-        createdAt: {
-          gte: new Date(new Date().setHours(0, 0, 0, 0)),
-          lt: new Date(new Date().setHours(23, 59, 59, 999)),
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+interface RegistryListProps {
+  patients: any[]; // Replace 'any' with your Patient type
+}
 
-    return (
-      <div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Patient Name</TableHead>
-              <TableHead>MRN</TableHead>
-              <TableHead>Disease</TableHead>
-              <TableHead>Registration Date</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Actions</TableHead>
+export function RegistryList({ patients }: RegistryListProps) {
+  return (
+    <div>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Patient Name</TableHead>
+            <TableHead>MRN</TableHead>
+            <TableHead>Disease</TableHead>
+            <TableHead>Registration Date</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {patients?.map((patient) => (
+            <TableRow key={patient.id}>
+              <TableCell>{patient.name}</TableCell>
+              <TableCell>{patient.mrn}</TableCell>
+              <TableCell>{patient.registries[0].disease.name}</TableCell>
+              <TableCell>
+                {new Date(patient.registries[0].createdAt).toLocaleDateString()}
+              </TableCell>
+              <TableCell>
+                {patient.registries[0].contacted
+                  ? "Contacted"
+                  : "Not Contacted"}
+              </TableCell>
+              <TableCell>
+                <Button asChild size="sm" variant="ghost">
+                  <Link href={`/patients/${patient.mrn}`}>
+                    <Eye className="mr-2 h-4 w-4" />
+                    View
+                  </Link>
+                </Button>
+              </TableCell>
             </TableRow>
-          </TableHeader>
-          <TableBody>
-            {patients?.map((patient) => (
-              <TableRow key={patient.id}>
-                <TableCell>{patient.name}</TableCell>
-                <TableCell>{patient.mrn}</TableCell>
-                <TableCell>{patient.registries[0].disease.name}</TableCell>
-                <TableCell>
-                  {patient.registries[0].createdAt.toLocaleDateString()}
-                </TableCell>
-                <TableCell>
-                  {patient.registries[0].contacted
-                    ? "Contacted"
-                    : "Not Contacted"}
-                </TableCell>
-                <TableCell>
-                  <Button asChild size="sm" variant="ghost">
-                    <Link href={`/patients/${patient.mrn}`}>
-                      <Eye className="mr-2 h-4 w-4" />
-                      View
-                    </Link>
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-    );
-  } catch (error) {
-    console.error("Failed to fetch patients:", error);
-    return <div>Error loading patient data</div>;
-  }
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
 }
