@@ -1,47 +1,79 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { PlusCircle } from 'lucide-react'
+"use client";
+
+import { useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { usePatient } from "@/hooks/use-patient";
+import { RelativeForm } from "@/components/relative-form";
+import { Relative } from "@prisma/client";
 
 interface RelativesListProps {
-  patientId: string
+  patientId: string;
 }
 
 export function RelativesList({ patientId }: RelativesListProps) {
-  // In a real application, you would fetch relatives data based on the patientId
-  const relatives = [
-    { id: 1, name: "Jane Doe", relation: "Spouse", contactInfo: "jane.doe@example.com", address: "123 Main St, Anytown, USA" },
-    { id: 2, name: "Mike Doe", relation: "Son", contactInfo: "mike.doe@example.com", address: "456 Elm St, Anytown, USA" },
-  ]
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const { relatives, relativesLoading } = usePatient(patientId);
+
+  if (relativesLoading) {
+    return (
+      <div className="flex items-center justify-center h-24">
+        <p className="text-muted-foreground">Loading relatives...</p>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Relatives</h2>
-        <Button>
-          <PlusCircle className="mr-2 h-4 w-4" /> Add Relative
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-semibold">Relatives</h3>
+        <Button onClick={() => setIsFormOpen(true)} size="sm">
+          Add Relative
         </Button>
       </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Relation</TableHead>
-            <TableHead>Contact Information</TableHead>
-            <TableHead>Address</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {relatives.map((relative) => (
-            <TableRow key={relative.id}>
-              <TableCell>{relative.name}</TableCell>
-              <TableCell>{relative.relation}</TableCell>
-              <TableCell>{relative.contactInfo}</TableCell>
-              <TableCell>{relative.address}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
-  )
-}
 
+      {relatives && relatives.length > 0 ? (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Relationship</TableHead>
+              <TableHead>Phone</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {relatives.map((relative: Relative) => (
+              <TableRow key={relative.id}>
+                <TableCell>{relative.relativeName}</TableCell>
+                <TableCell>{relative.relation}</TableCell>
+                <TableCell>{relative.relativeContact}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      ) : (
+        <div className="flex items-center justify-center h-24">
+          <p className="text-muted-foreground">No relatives found.</p>
+        </div>
+      )}
+
+      {isFormOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+          <div className="bg-background p-6 rounded-lg">
+            <RelativeForm
+              patientId={patientId}
+              onCancel={() => setIsFormOpen(false)}
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

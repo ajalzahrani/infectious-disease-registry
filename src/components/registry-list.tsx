@@ -9,68 +9,74 @@ import {
 import { Button } from "@/components/ui/button";
 import { Eye } from "lucide-react";
 import Link from "next/link";
+import { prisma } from "@/lib/prisma";
 
-const registryEntries = [
-  {
-    id: 1,
-    patientName: "John Doe",
-    mrn: "MRN001",
-    disease: "COVID-19",
-    registrationDate: "2023-06-01",
-    status: "Contacted",
-  },
-  {
-    id: 2,
-    patientName: "Jane Smith",
-    mrn: "MRN002",
-    disease: "Influenza",
-    registrationDate: "2023-06-05",
-    status: "Not Contacted",
-  },
-  {
-    id: 3,
-    patientName: "Mike Johnson",
-    mrn: "MRN003",
-    disease: "Tuberculosis",
-    registrationDate: "2023-06-10",
-    status: "Contacted",
-  },
-];
+export async function RegistryList() {
+  try {
+    const patients = await prisma.patient.findMany({
+      include: {
+        registries: {
+          include: {
+            disease: true,
+            registeredBy: true,
+          },
+        },
+        relatives: true,
+      },
+      where: {
+        createdAt: {
+          gte: new Date(new Date().setHours(0, 0, 0, 0)),
+          lt: new Date(new Date().setHours(23, 59, 59, 999)),
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
 
-export function RegistryList() {
-  return (
-    <div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Patient Name</TableHead>
-            <TableHead>MRN</TableHead>
-            <TableHead>Disease</TableHead>
-            <TableHead>Registration Date</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {registryEntries.map((entry) => (
-            <TableRow key={entry.id}>
-              <TableCell>{entry.patientName}</TableCell>
-              <TableCell>{entry.mrn}</TableCell>
-              <TableCell>{entry.disease}</TableCell>
-              <TableCell>{entry.registrationDate}</TableCell>
-              <TableCell>{entry.status}</TableCell>
-              <TableCell>
-                <Button asChild size="sm" variant="ghost">
-                  <Link href={`/patients/${entry.id}`}>
-                    <Eye className="mr-2 h-4 w-4" />
-                    View
-                  </Link>
-                </Button>
-              </TableCell>
+    return (
+      <div>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Patient Name</TableHead>
+              <TableHead>MRN</TableHead>
+              <TableHead>Disease</TableHead>
+              <TableHead>Registration Date</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
-  );
+          </TableHeader>
+          <TableBody>
+            {patients?.map((patient) => (
+              <TableRow key={patient.id}>
+                <TableCell>{patient.name}</TableCell>
+                <TableCell>{patient.mrn}</TableCell>
+                <TableCell>{patient.registries[0].disease.name}</TableCell>
+                <TableCell>
+                  {patient.registries[0].createdAt.toLocaleDateString()}
+                </TableCell>
+                <TableCell>
+                  {patient.registries[0].contacted
+                    ? "Contacted"
+                    : "Not Contacted"}
+                </TableCell>
+                <TableCell>
+                  <Button asChild size="sm" variant="ghost">
+                    <Link href={`/patients/${patient.mrn}`}>
+                      <Eye className="mr-2 h-4 w-4" />
+                      View
+                    </Link>
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    );
+  } catch (error) {
+    console.error("Failed to fetch patients:", error);
+    return <div>Error loading patient data</div>;
+  }
 }

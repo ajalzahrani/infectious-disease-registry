@@ -41,6 +41,9 @@ export function usePatients() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["patients"] });
     },
+    onError: (error) => {
+      console.error("Error creating patient:", error);
+    },
   });
 
   return {

@@ -9,8 +9,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DatePickerWithRange } from "@/components/date-range-picker";
+import { getDiseases } from "@/lib/data";
 
-export function RegistryFilters() {
+interface Disease {
+  value: string;
+  label: string;
+}
+
+export async function RegistryFilters() {
+  const diseases = await getDiseases();
+
   return (
     <div className="space-y-4">
       <div>
@@ -24,9 +32,11 @@ export function RegistryFilters() {
             <SelectValue placeholder="Select disease" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="covid-19">COVID-19</SelectItem>
-            <SelectItem value="influenza">Influenza</SelectItem>
-            <SelectItem value="tuberculosis">Tuberculosis</SelectItem>
+            {diseases.map((disease) => (
+              <SelectItem key={disease.value} value={disease.value}>
+                {disease.label}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>

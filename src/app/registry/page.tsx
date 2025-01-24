@@ -1,5 +1,6 @@
 import { RegistryList } from "@/components/registry-list";
 import { RegistryFilters } from "@/components/registry-filters";
+import { Suspense } from "react";
 
 export default function RegistryPage() {
   return (
@@ -13,7 +14,9 @@ export default function RegistryPage() {
           <RegistryFilters />
         </aside>
         <main>
-          <RegistryList />
+          <Suspense fallback={<div>Loading patients...</div>}>
+            <RegistryList />
+          </Suspense>
         </main>
       </div>
     </div>

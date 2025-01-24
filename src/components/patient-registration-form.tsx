@@ -99,19 +99,7 @@ export function PatientRegistrationForm() {
         diseases: data.diseases,
       };
 
-      const response = await fetch("/api/patients", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(patientData),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "Failed to create patient");
-      }
+      createPatient(patientData);
 
       toast({
         title: "Success",

@@ -1,19 +1,20 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { prisma } from "@/lib/prisma";
 
 interface PatientInfoProps {
-  patientId: string
+  patientId: string;
 }
 
-export function PatientInfo({ patientId }: PatientInfoProps) {
-  // In a real application, you would fetch patient data based on the patientId
-  const patient = {
-    mrn: "MRN001",
-    name: "John Doe",
-    age: 35,
-    gender: "Male",
-    contactInfo: "john.doe@example.com",
-    address: "123 Main St, Anytown, USA",
-  }
+export async function PatientInfo({ patientId }: PatientInfoProps) {
+  const patient = await prisma.patient.findUnique({
+    where: { id: patientId },
+    include: {
+      registries: true,
+      relatives: true,
+    },
+  });
+
+  if (!patient) return null;
 
   return (
     <Card>
@@ -40,15 +41,18 @@ export function PatientInfo({ patientId }: PatientInfoProps) {
           </div>
           <div>
             <p className="text-sm font-medium">Contact Information</p>
-            <p className="text-sm text-muted-foreground">{patient.contactInfo}</p>
+            <p className="text-sm text-muted-foreground">
+              {patient.contactInfo}
+            </p>
           </div>
           <div>
             <p className="text-sm font-medium">Address</p>
-            <p className="text-sm text-muted-foreground">{patient.address}</p>
+            <p className="text-sm text-muted-foreground">
+              {patient.address || "N/A"}
+            </p>
           </div>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
-

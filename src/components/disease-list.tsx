@@ -1,11 +1,18 @@
-"use client";
+import { prisma } from "@/lib/prisma";
+import { Disease } from "@prisma/client";
 
-import { useDiseases } from "@/hooks/use-diseases";
+export async function DiseaseList({ patientId }: { patientId: string }) {
+  const diseases = await prisma.disease.findMany({
+    where: {
+      registries: {
+        some: {
+          patientId: patientId,
+        },
+      },
+    },
+  });
 
-export function DiseaseList() {
-  const { diseases, isLoading } = useDiseases();
-
-  if (isLoading) {
+  if (!diseases) {
     return (
       <div className="flex items-center justify-center h-24">
         <p className="text-muted-foreground">Loading diseases...</p>
@@ -23,7 +30,7 @@ export function DiseaseList() {
 
   return (
     <div className="space-y-4">
-      {diseases.map((disease) => (
+      {diseases?.map((disease: Disease) => (
         <div
           key={disease.id}
           className="p-4 rounded-lg border bg-card text-card-foreground shadow-sm">
