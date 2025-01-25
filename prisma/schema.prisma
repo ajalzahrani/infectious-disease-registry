@@ -18,6 +18,7 @@ model Patient {
   updatedAt   DateTime   @updatedAt
   registries  Registry[]
   relatives   Relative[]
+  activites   Activity[]
 }
 
 model Disease {
@@ -58,4 +59,16 @@ model User {
   passwordHash String
   createdAt    DateTime   @default(now())
   registries   Registry[] @relation("RegisteredBy")
-} 
+  activites   Activity[]
+}
+
+model Activity {
+  id          String    @id @default(cuid())
+  description String
+  type        String    
+  patient     Patient?   @relation(fields: [patientId], references: [id])
+  patientId   String?
+  user        User      @relation(fields: [userId], references: [id])
+  userId      String
+  createdAt   DateTime  @default(now())
+}

@@ -47,12 +47,8 @@ export async function POST(request: Request) {
           ...patientData,
           registries: {
             create: diseases.map((diseaseId: string) => ({
-              disease: {
-                connect: { id: diseaseId },
-              },
-              registeredBy: {
-                connect: { id: "1" },
-              },
+              disease: { connect: { id: diseaseId } },
+              registeredBy: { connect: { id: "1" } },
               contacted: false,
             })),
           },
@@ -66,6 +62,17 @@ export async function POST(request: Request) {
           },
         },
       });
+
+      // Create activity for new patient
+      await tx.activity.create({
+        data: {
+          type: "PATIENT_ADDED",
+          description: `New patient added: ${newPatient.name}`,
+          patientId: newPatient.id,
+          userId: "1", // Replace with actual user ID from auth
+        },
+      });
+
       return newPatient;
     });
 
