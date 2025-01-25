@@ -1,29 +1,76 @@
-import { Phone } from 'lucide-react'
-import { Button } from "@/components/ui/button"
+import { Phone } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { prisma } from "@/lib/prisma";
+import { formatDistanceToNow } from "date-fns";
 
-const pendingContacts = [
-  { id: 1, name: "Alice Brown", disease: "COVID-19", dueDate: "2023-06-15" },
-  { id: 2, name: "Bob Wilson", disease: "Influenza", dueDate: "2023-06-16" },
-  { id: 3, name: "Carol Davis", disease: "Tuberculosis", dueDate: "2023-06-17" },
-]
-
-export function PendingContacts() {
-  return (
-    <div className="space-y-4">
-      {pendingContacts.map((contact) => (
-        <div key={contact.id} className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium">{contact.name}</p>
-            <p className="text-sm text-muted-foreground">{contact.disease}</p>
-            <p className="text-xs text-muted-foreground">Due: {contact.dueDate}</p>
-          </div>
-          <Button size="sm" variant="outline">
-            <Phone className="h-4 w-4 mr-2" />
-            Contact
-          </Button>
-        </div>
-      ))}
-    </div>
-  )
+async function getPendingContacts() {
+  try {
+    return {
+      data: await prisma.registry.findMany({
+        where: {
+          contacted: false,
+        },
+        take: 5,
+        orderBy: {
+          createdAt: "asc",
+        },
+        include: {
+          patient: {
+            select: {
+              id: true,
+              name: true,
+              contactInfo: true,
+            },
+          },
+          disease: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      }),
+      error: null,
+    };
+  } catch (error) {
+    console.error("Error fetching pending contacts:", error);
+    return {
+      data: null,
+      error: "Failed to load pending contacts",
+    };
+  }
 }
 
+export async function PendingContacts() {
+  const pendingContacts = await getPendingContacts();
+
+  return (
+    <div className="space-y-4">
+      {pendingContacts.data &&
+        pendingContacts.data.map((contact) => (
+          <div key={contact.id} className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium">{contact.patient.name}</p>
+              <p className="text-sm text-muted-foreground">
+                {contact.disease.name}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Due:{" "}
+                {formatDistanceToNow(contact.createdAt, { addSuffix: true })}
+              </p>
+            </div>
+            <Button asChild size="sm" variant="outline">
+              <a href={`/patients/${contact.patient.id}`}>
+                <Phone className="h-4 w-4 mr-2" />
+                Contact
+              </a>
+            </Button>
+          </div>
+        ))}
+      {pendingContacts.data && pendingContacts.data.length === 0 && (
+        <div className="text-center text-muted-foreground">
+          No pending contacts
+        </div>
+      )}
+    </div>
+  );
+}
