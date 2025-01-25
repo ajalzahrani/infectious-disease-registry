@@ -1,20 +1,21 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
-export async function GET(
-  request: Request,
-  context: { params: { mrn: string } }
-) {
-  const mrn = context.params.mrn;
+export async function GET(request: Request) {
+  const { patientId } = await request.json();
+  // const patientId = context.params.patientId;
 
-  if (!mrn) {
-    return NextResponse.json({ error: "MRN is required" }, { status: 400 });
+  if (!patientId) {
+    return NextResponse.json(
+      { error: "Patient ID is required" },
+      { status: 400 }
+    );
   }
 
   try {
     const patient = await prisma.patient.findUnique({
       where: {
-        mrn,
+        id: patientId,
       },
       include: {
         registries: {

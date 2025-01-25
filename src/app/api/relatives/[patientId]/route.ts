@@ -5,7 +5,7 @@ export async function GET(
   request: Request,
   context: { params: { patientId: string } }
 ) {
-  const patientId = context.params.patientId;
+  const { patientId } = context.params;
 
   if (!patientId) {
     return NextResponse.json(

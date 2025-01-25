@@ -21,7 +21,7 @@ interface RegistryFiltersProps {
 export function RegistryFilters({ onFilter }: RegistryFiltersProps) {
   const { diseases } = useDiseases();
   const [filters, setFilters] = useState({
-    search: "",
+    mrn: "",
     disease: "",
     status: "",
     dateRange: {
@@ -42,8 +42,8 @@ export function RegistryFilters({ onFilter }: RegistryFiltersProps) {
         <Input
           id="search"
           placeholder="Search by name or MRN"
-          value={filters.search}
-          onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+          value={filters.mrn}
+          onChange={(e) => setFilters({ ...filters, mrn: e.target.value })}
         />
       </div>
       <div>

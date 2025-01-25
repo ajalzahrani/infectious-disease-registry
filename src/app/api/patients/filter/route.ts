@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const search = searchParams.get("search");
+  const mrn = searchParams.get("mrn");
   const disease = searchParams.get("disease");
   const status = searchParams.get("status");
   const from = searchParams.get("from");
@@ -13,9 +13,9 @@ export async function GET(request: Request) {
     const patients = await prisma.patient.findMany({
       where: {
         OR: [
-          search
+          mrn
             ? {
-                mrn: { contains: search },
+                mrn: { contains: mrn },
               }
             : {},
           disease

@@ -7,16 +7,18 @@ import { PatientRegistry } from "@/components/patient-registry-form";
 
 interface PatientProfilePageProps {
   params: {
-    mrn: string;
+    patientId: string;
   };
 }
 
 export default async function PatientProfilePage({
   params,
 }: PatientProfilePageProps) {
+  const { patientId } = await params;
+
   const patient = await prisma.patient.findUnique({
     where: {
-      mrn: params.mrn,
+      id: patientId,
     },
     include: {
       registries: {

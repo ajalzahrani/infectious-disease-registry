@@ -14,13 +14,13 @@ export function RegistryClientWrapper({
   const [filteredPatients, setFilteredPatients] = useState(initialPatients);
 
   const handleFilter = async (filters: {
-    search?: string;
+    mrn?: string;
     disease?: string;
     status?: string;
     dateRange?: { from: Date; to: Date };
   }) => {
     const queryParams = new URLSearchParams();
-    if (filters.search) queryParams.append("search", filters.search);
+    if (filters.mrn) queryParams.append("mrn", filters.mrn);
     if (filters.disease) queryParams.append("disease", filters.disease);
     if (filters.status) queryParams.append("status", filters.status);
     if (filters.dateRange?.from)
