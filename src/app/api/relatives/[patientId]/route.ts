@@ -3,9 +3,9 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   request: Request,
-  context: { params: { patientId: string } }
+  context: { params: Promise<{ patientId: string }> }
 ) {
-  const { patientId } = context.params;
+  const { patientId } = (await context.params);
 
   if (!patientId) {
     return NextResponse.json(
@@ -41,9 +41,9 @@ export async function GET(
 
 export async function POST(
   request: Request,
-  context: { params: { patientId: string } }
+  context: { params: Promise<{ patientId: string }> }
 ) {
-  const patientId = context.params.patientId;
+  const patientId = (await context.params).patientId;
 
   if (!patientId) {
     return NextResponse.json(

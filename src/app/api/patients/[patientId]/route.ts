@@ -1,9 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
-export async function GET(request: Request) {
-  const { patientId } = await request.json();
-  // const patientId = context.params.patientId;
+export async function GET(
+  request: Request,
+  context: { params: Promise<{ patientId: string }> }
+) {
+  const patientId = (await context.params).patientId;
 
   if (!patientId) {
     return NextResponse.json(
