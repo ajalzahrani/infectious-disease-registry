@@ -1,50 +1,24 @@
 "use client";
+
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { rolePermissions } from "@/lib/permissions";
 import { Home, Users, FileText, Bell, Pill } from "lucide-react";
-import { use } from "react";
 
-const sidebarNavItems = [
-  {
-    title: "Dashboard",
-    href: "/",
-    icon: Home,
-  },
-  {
-    title: "Register Patient",
-    icon: FileText,
-    href: "/patients/register",
-  },
-  {
-    title: "Registry",
-    href: "/registry",
-    icon: FileText,
-  },
-  {
-    title: "Notifications",
-    href: "/notifications",
-    icon: Bell,
-  },
-  {
-    title: "Diseases",
-    href: "/diseases",
-    icon: Pill,
-  },
-];
-
-interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
-  items: {
-    href: string;
-    title: string;
-    icon: React.ElementType;
-  }[];
-}
+const icons = {
+  Home,
+  FileText,
+  Bell,
+  Pill,
+  Users,
+} as const;
 
 export function Sidebar({ className }: React.ComponentProps<"div">) {
-  const pathname = usePathname();
+  const { data: session } = useSession();
+  const userRole = session?.user?.role as keyof typeof rolePermissions;
+  const navItems = rolePermissions[userRole]?.navItems || [];
 
   return (
     <div className={cn("pb-12 w-64 bg-background border-r", className)}>
@@ -54,7 +28,7 @@ export function Sidebar({ className }: React.ComponentProps<"div">) {
             Menu
           </h2>
           <div className="space-y-1">
-            <SidebarNav items={sidebarNavItems} />
+            <SidebarNav items={navItems} />
           </div>
         </div>
       </div>
@@ -62,30 +36,32 @@ export function Sidebar({ className }: React.ComponentProps<"div">) {
   );
 }
 
-export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
+function SidebarNav({
+  items,
+}: {
+  items: (typeof rolePermissions)[keyof typeof rolePermissions]["navItems"];
+}) {
   const pathname = usePathname();
 
   return (
-    <nav
-      className={cn(
-        "flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1",
-        className
-      )}
-      {...props}>
-      {items.map((item) => (
-        <Link
-          key={item.href}
-          href={item.href}
-          className={cn(
-            "flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
-            pathname === item.href
-              ? "bg-accent text-accent-foreground"
-              : "transparent"
-          )}>
-          <item.icon className="mr-2 h-4 w-4" />
-          {item.title}
-        </Link>
-      ))}
+    <nav className="flex flex-col space-y-1">
+      {items.map((item) => {
+        const Icon = icons[item.icon as keyof typeof icons];
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={cn(
+              "flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
+              pathname === item.href
+                ? "bg-accent text-accent-foreground"
+                : "transparent"
+            )}>
+            <Icon className="mr-2 h-4 w-4" />
+            {item.title}
+          </Link>
+        );
+      })}
     </nav>
   );
 }

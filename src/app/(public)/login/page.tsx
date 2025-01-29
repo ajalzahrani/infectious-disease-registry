@@ -22,32 +22,40 @@ export default function LoginPage() {
     event.preventDefault();
     setIsLoading(true);
 
-    const formData = new FormData(event.currentTarget);
-    const username = formData.get("username") as string;
-    const password = formData.get("password") as string;
-
     try {
+      const formData = new FormData(event.currentTarget);
+
       const result = await signIn("credentials", {
-        username,
-        password,
+        username: formData.get("username"),
+        password: formData.get("password"),
         redirect: false,
       });
 
       if (result?.error) {
         toast({
           title: "Error",
-          description: "Invalid credentials",
+          description:
+            result.error === "CredentialsSignin"
+              ? "Invalid credentials"
+              : result.error,
           variant: "destructive",
         });
         return;
       }
 
+      // Successful login
+      toast({
+        title: "Success",
+        description: "Logged in successfully",
+      });
+
       router.push("/");
       router.refresh();
     } catch (error) {
+      console.error("Login error:", error);
       toast({
         title: "Error",
-        description: "Something went wrong",
+        description: "Something went wrong during login",
         variant: "destructive",
       });
     } finally {

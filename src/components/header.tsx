@@ -1,6 +1,6 @@
-import { UserNav } from "./user-nav"
-import { ModeToggle } from "./mode-toggle"
-import { Search } from "./search"
+import { UserNav } from "./user-nav";
+import { ModeToggle } from "./mode-toggle";
+import { Search } from "./search";
 
 export function Header() {
   return (
@@ -22,6 +22,5 @@ export function Header() {
         </div>
       </div>
     </header>
-  )
+  );
 }
-

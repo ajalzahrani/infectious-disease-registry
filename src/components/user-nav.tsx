@@ -1,5 +1,6 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
+import { auth } from "@/auth";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,9 +10,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
+import Link from "next/link";
 
-export function UserNav() {
+export async function UserNav() {
+  const session = await auth();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -27,7 +30,7 @@ export function UserNav() {
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">shadcn</p>
             <p className="text-xs leading-none text-muted-foreground">
-              m@example.com
+              {session?.user?.username}
             </p>
           </div>
         </DropdownMenuLabel>
@@ -44,11 +47,10 @@ export function UserNav() {
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
-          Log out
+          <Link href="/api/auth/signout">Log out</Link>
           <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }
-
