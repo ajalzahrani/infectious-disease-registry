@@ -30,7 +30,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const json = await request.json();
-    const { diseases, ...patientData } = json;
+    const { diseases, registeredBy, ...patientData } = json;
 
     if (!diseases || !Array.isArray(diseases)) {
       return NextResponse.json(
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
           registries: {
             create: diseases.map((diseaseId: string) => ({
               disease: { connect: { id: diseaseId } },
-              registeredBy: { connect: { id: "1" } },
+              registeredBy: { connect: { id: registeredBy } },
               contacted: false,
             })),
           },
@@ -69,7 +69,7 @@ export async function POST(request: Request) {
           type: "PATIENT_ADDED",
           description: `New patient added: ${newPatient.name}`,
           patientId: newPatient.id,
-          userId: "1", // Replace with actual user ID from auth
+          userId: registeredBy,
         },
       });
 

@@ -29,44 +29,33 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
       async authorize(credentials) {
         try {
-          console.log("Starting authorization attempt");
-
           if (!credentials?.username || !credentials?.password) {
-            console.log("Missing credentials in request");
             throw new Error("Missing credentials");
           }
 
           const username = credentials.username as string;
-          console.log("Looking up user:", username);
 
           // First get the user
           const user = await getUserFromDb(username);
-          console.log("User found:", !!user);
 
           if (!user || !user.password) {
-            console.log("User not found or missing password");
             throw new Error("Invalid credentials");
           }
 
           // Compare the provided password with stored hash
-          console.log("Comparing passwords...");
           const isPasswordValid = await bcrypt.compare(
             credentials.password,
             user.password
           );
-          console.log("Password valid:", isPasswordValid);
 
           if (!isPasswordValid) {
-            console.log("Invalid password");
             throw new Error("Invalid credentials");
           }
 
           // Return user without password
           const { password: _, ...userWithoutPassword } = user;
-          console.log("Auth successful");
           return userWithoutPassword;
         } catch (error) {
-          console.error("Auth error:", error);
           throw error;
         }
       },
@@ -74,14 +63,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
   callbacks: {
     async jwt({ token, user }) {
-      console.log("JWT Callback - Token:", token, "User:", user);
       if (user) {
         token.user = user;
       }
       return token;
     },
     async session({ session, token }) {
-      console.log("Session Callback - Session:", session, "Token:", token);
       if (token?.user) {
         session.user = token.user;
       }

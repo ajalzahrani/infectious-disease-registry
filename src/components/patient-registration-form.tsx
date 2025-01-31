@@ -25,6 +25,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { toast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 const patientSchema = z.object({
   mrn: z.string().min(1, "MRN is required"),
@@ -42,6 +43,7 @@ export function PatientRegistrationForm() {
   const [isFetchingMRN, setIsFetchingMRN] = useState(false);
   const { createPatient } = usePatients();
   const { diseases } = useDiseases();
+  const { data: session } = useSession();
 
   const form = useForm<PatientFormValues>({
     resolver: zodResolver(patientSchema),
@@ -97,6 +99,7 @@ export function PatientRegistrationForm() {
         gender: data.gender,
         contactInfo: data.contactInfo,
         diseases: data.diseases,
+        registeredBy: session?.user?.id,
       };
 
       createPatient(patientData);

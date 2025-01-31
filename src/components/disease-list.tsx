@@ -1,17 +1,19 @@
 import { prisma } from "@/lib/prisma";
 import { Disease } from "@prisma/client";
 
-export async function DiseaseList({ patientId }: { patientId: string }) {
-  const diseases = await prisma.disease.findMany({
-    where: {
-      registries: {
-        some: {
-          patientId: patientId,
+export async function DiseaseList({ patientId }: { patientId: string | null }) {
+  let diseases: Disease[] | null = null;
+  if (patientId === null) {
+    diseases = await prisma.disease.findMany();
+  } else {
+    diseases = await prisma.disease.findMany({
+      where: {
+        registries: {
+          some: { patientId: patientId },
         },
       },
-    },
-  });
-
+    });
+  }
   if (!diseases) {
     return (
       <div className="flex items-center justify-center h-24">

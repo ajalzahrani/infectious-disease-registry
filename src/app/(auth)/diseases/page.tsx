@@ -21,7 +21,7 @@ export default function DiseasesPage() {
                 <p className="text-muted-foreground">Loading diseases...</p>
               </div>
             }>
-            <DiseaseList />
+            <DiseaseList patientId={null} />
           </Suspense>
         </div>
       </div>

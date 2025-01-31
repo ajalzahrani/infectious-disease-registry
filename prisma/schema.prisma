@@ -36,10 +36,14 @@ model Registry {
   diseaseId   String
   contacted   Boolean   @default(false)
   contactDate DateTime?
-  comments    String?   // Add this field
-  registeredBy User     @relation("RegisteredBy", fields: [userId], references: [id])
+  comments    String?
+  registeredBy User     @relation("RegisteredBy", fields: [userId], references: [id], onDelete: Cascade)
   userId      String
   createdAt   DateTime  @default(now())
+
+  @@index([patientId])
+  @@index([diseaseId])
+  @@index([userId])
 }
 
 model Relative {
