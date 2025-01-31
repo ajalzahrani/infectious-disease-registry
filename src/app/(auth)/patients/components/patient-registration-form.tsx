@@ -39,10 +39,9 @@ const patientSchema = z.object({
 type PatientFormValues = z.infer<typeof patientSchema>;
 
 export function PatientRegistrationForm() {
-  const [isLoading, setIsLoading] = useState(false);
   const [isFetchingMRN, setIsFetchingMRN] = useState(false);
-  const { createPatient } = usePatients();
-  const { diseases } = useDiseases();
+  const { createPatient, isLoadingCreatePatient } = usePatients();
+  const { diseasesOptions } = useDiseases();
   const { data: session } = useSession();
 
   const form = useForm<PatientFormValues>({
@@ -90,7 +89,6 @@ export function PatientRegistrationForm() {
   };
 
   const onSubmit = async (data: PatientFormValues) => {
-    setIsLoading(true);
     try {
       const patientData = {
         mrn: data.mrn,
@@ -117,8 +115,6 @@ export function PatientRegistrationForm() {
           error instanceof Error ? error.message : "Failed to register patient",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -240,7 +236,7 @@ export function PatientRegistrationForm() {
                     <SelectValue placeholder="Select diseases" />
                   </SelectTrigger>
                   <SelectContent>
-                    {diseases?.map((disease) => (
+                    {diseasesOptions?.map((disease) => (
                       <SelectItem key={disease.id} value={disease.id}>
                         {disease.name}
                       </SelectItem>
@@ -251,7 +247,9 @@ export function PatientRegistrationForm() {
               {field.value?.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-2">
                   {field.value.map((diseaseId) => {
-                    const disease = diseases?.find((d) => d.id === diseaseId);
+                    const disease = diseasesOptions?.find(
+                      (d) => d.id === diseaseId
+                    );
                     return (
                       <div
                         key={diseaseId}
@@ -277,8 +275,10 @@ export function PatientRegistrationForm() {
           )}
         />
 
-        <Button type="submit" disabled={isLoading}>
-          {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        <Button type="submit" disabled={isLoadingCreatePatient}>
+          {isLoadingCreatePatient && (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          )}
           Register Patient
         </Button>
       </form>

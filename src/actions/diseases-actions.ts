@@ -7,7 +7,7 @@ interface DiseaseOption {
   label: string;
 }
 
-export async function getDiseasesOptions(): Promise<DiseaseOption[]> {
+export async function getDiseasesOptions(): Promise<Partial<Disease>[]> {
   // Replace this with your actual database query
   const diseases = await prisma.disease.findMany({
     select: {
@@ -16,10 +16,7 @@ export async function getDiseasesOptions(): Promise<DiseaseOption[]> {
     },
   });
 
-  return diseases.map((disease) => ({
-    value: disease.id,
-    label: disease.name,
-  }));
+  return diseases;
 }
 
 export async function getDiseases(): Promise<Disease[]> {
@@ -34,7 +31,7 @@ export async function getDiseaseById(id: string): Promise<Disease | null> {
   return disease;
 }
 
-export async function getDiseaseByPatientId(
+export async function getDiseasesByPatientId(
   patientId: string
 ): Promise<Disease[]> {
   const diseases = await prisma.disease.findMany({

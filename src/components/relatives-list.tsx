@@ -10,9 +10,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { usePatient } from "@/hooks/use-patient";
 import { RelativeForm } from "@/components/relative-form";
 import { Relative } from "@prisma/client";
+import { getRelatives } from "@/actions/relatives-actions";
+import { useQuery } from "@tanstack/react-query";
 
 interface RelativesListProps {
   patientId: string;
@@ -20,9 +21,16 @@ interface RelativesListProps {
 
 export function RelativesList({ patientId }: RelativesListProps) {
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const { relatives, relativesLoading } = usePatient(patientId);
 
-  if (relativesLoading) {
+  const { data: relatives, isLoading: isLoadingRelatives } = useQuery<
+    Relative[]
+  >({
+    queryKey: ["relatives", patientId],
+    queryFn: () => getRelatives(patientId),
+    enabled: !!patientId, // Only run the query if patientId is truthy
+  });
+
+  if (isLoadingRelatives) {
     return (
       <div className="flex items-center justify-center h-24">
         <p className="text-muted-foreground">Loading relatives...</p>

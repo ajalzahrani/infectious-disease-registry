@@ -14,7 +14,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { usePatient } from "@/hooks/use-patient";
+import { usePatients } from "@/hooks/use-patients";
 
 // Define the validation schema
 const relativeSchema = z.object({
@@ -32,7 +32,7 @@ interface RelativeFormProps {
 
 export function RelativeForm({ patientId, onCancel }: RelativeFormProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const { createRelativeMutation } = usePatient(patientId);
+  const { createRelative, isLoadingCreateRelative } = usePatients();
   const form = useForm<RelativeFormValues>({
     resolver: zodResolver(relativeSchema),
     defaultValues: {
@@ -45,7 +45,7 @@ export function RelativeForm({ patientId, onCancel }: RelativeFormProps) {
   const handleSubmit = async (data: RelativeFormValues) => {
     setIsLoading(true);
     try {
-      await createRelativeMutation({
+      createRelative({
         patientId,
         relativeName: data.name,
         relation: data.relationship,

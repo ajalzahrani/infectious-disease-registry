@@ -7,6 +7,7 @@ import {
   updateDisease,
   deleteDisease,
   getDiseaseById,
+  getDiseasesOptions,
 } from "@/actions/diseases-actions";
 
 export function useDiseases() {
@@ -20,6 +21,14 @@ export function useDiseases() {
     queryKey: ["diseases"],
     queryFn: async () => {
       const response = await getDiseases();
+      return response;
+    },
+  });
+
+  const { data: diseasesOptions } = useQuery<Partial<Disease>[]>({
+    queryKey: ["diseasesOptions"],
+    queryFn: async () => {
+      const response = await getDiseasesOptions();
       return response;
     },
   });
@@ -55,6 +64,7 @@ export function useDiseases() {
 
   return {
     diseases,
+    diseasesOptions,
     isLoadingDiseases,
     errorDiseases,
     createDisease: createDiseaseMutation,

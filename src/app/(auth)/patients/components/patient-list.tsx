@@ -3,7 +3,7 @@
 import { usePatients } from "@/hooks/use-patients";
 
 export function PatientList() {
-  const { patients, isLoading, createPatient } = usePatients();
+  const { patients, isLoading } = usePatients();
 
   if (isLoading) {
     return (

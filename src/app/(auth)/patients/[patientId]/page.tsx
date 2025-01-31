@@ -1,9 +1,9 @@
-import { PatientInfo } from "@/components/patient-info";
-import { DiseaseList } from "@/app/(auth)/diseases/components/list-disease";
+import { PatientInfo } from "@/app/(auth)/patients/components/patient-info";
 import { RelativesList } from "@/components/relatives-list";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { prisma } from "@/lib/prisma";
 import { PatientRegistry } from "@/components/patient-registry-form";
+import { PatientDiseaseList } from "../components/patient-diease-list";
 
 interface PatientProfilePageProps {
   params: {
@@ -50,7 +50,7 @@ export default async function PatientProfilePage({
               <TabsTrigger value="relatives">Relatives</TabsTrigger>
             </TabsList>
             <TabsContent value="diseases">
-              <DiseaseList patientId={patient.id} />
+              <PatientDiseaseList patientId={patient.id} />
             </TabsContent>
             <TabsContent value="relatives">
               <RelativesList patientId={patient.id} />

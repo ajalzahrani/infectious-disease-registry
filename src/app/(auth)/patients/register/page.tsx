@@ -1,4 +1,4 @@
-import { PatientRegistrationForm } from "@/components/patient-registration-form";
+import { PatientRegistrationForm } from "@/app/(auth)/patients/components/patient-registration-form";
 
 export default function PatientRegistrationPage() {
   return (
