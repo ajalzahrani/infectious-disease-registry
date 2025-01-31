@@ -229,3 +229,28 @@ export async function getFilteredPatients({
     return { success: false, error: "Failed to fetch patients" };
   }
 }
+
+export async function getTodayRegistryPatients() {
+  const today = new Date();
+  const patients = await prisma.patient.findMany({
+    include: {
+      registries: {
+        include: {
+          disease: true,
+          registeredBy: true,
+        },
+      },
+      relatives: true,
+    },
+    where: {
+      createdAt: {
+        gte: new Date(today.setHours(0, 0, 0, 0)),
+        lt: new Date(today.setHours(23, 59, 59, 999)),
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+  return patients;
+}

@@ -71,7 +71,7 @@ export function usePatients() {
         return response;
       },
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["patients"] });
+        queryClient.invalidateQueries({ queryKey: ["relatives"] });
       },
     });
 

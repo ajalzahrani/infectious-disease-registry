@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { RelativeForm } from "@/components/relative-form";
+import { RelativeForm } from "@/app/(auth)/patients/components/relative-form";
 import { Relative } from "@prisma/client";
 import { getRelatives } from "@/actions/relatives-actions";
 import { useQuery } from "@tanstack/react-query";

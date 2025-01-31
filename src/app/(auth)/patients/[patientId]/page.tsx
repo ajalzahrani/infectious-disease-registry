@@ -1,8 +1,8 @@
 import { PatientInfo } from "@/app/(auth)/patients/components/patient-info";
-import { RelativesList } from "@/components/relatives-list";
+import { RelativesList } from "@/app/(auth)/patients/components/relatives-list";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { prisma } from "@/lib/prisma";
-import { PatientRegistry } from "@/components/patient-registry-form";
+import { PatientRegistry } from "@/app/(auth)/registry/components/patient-registry-form";
 import { PatientDiseaseList } from "../components/patient-diease-list";
 
 interface PatientProfilePageProps {
