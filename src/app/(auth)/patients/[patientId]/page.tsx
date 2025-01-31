@@ -1,5 +1,5 @@
 import { PatientInfo } from "@/components/patient-info";
-import { DiseaseList } from "@/components/disease-list";
+import { DiseaseList } from "@/app/(auth)/diseases/components/list-disease";
 import { RelativesList } from "@/components/relatives-list";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { prisma } from "@/lib/prisma";

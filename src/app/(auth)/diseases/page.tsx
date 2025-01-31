@@ -1,6 +1,6 @@
 import { Suspense } from "react";
-import { DiseaseList } from "@/components/disease-list";
-import { AddDiseaseForm } from "@/components/add-disease-form";
+import { DiseaseList } from "@/app/(auth)/diseases/components/list-disease";
+import { AddDiseaseForm } from "@/app/(auth)/diseases/components/add-disease-form";
 
 export default function DiseasesPage() {
   return (
@@ -21,7 +21,7 @@ export default function DiseasesPage() {
                 <p className="text-muted-foreground">Loading diseases...</p>
               </div>
             }>
-            <DiseaseList patientId={null} />
+            <DiseaseList />
           </Suspense>
         </div>
       </div>

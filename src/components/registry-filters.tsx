@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DatePickerWithRange } from "@/components/date-range-picker";
-import { useDiseases } from "@/hooks/use-diseases";
+import { useDiseases } from "@/app/(auth)/diseases/hooks/use-diseases";
 
 interface RegistryFiltersProps {
   onFilter: (filters: any) => void;

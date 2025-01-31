@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { usePatients } from "@/hooks/use-patients";
-import { useDiseases } from "@/hooks/use-diseases";
+import { useDiseases } from "@/app/(auth)/diseases/hooks/use-diseases";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
