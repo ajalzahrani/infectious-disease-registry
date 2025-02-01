@@ -61,13 +61,18 @@ export async function updateRegistry(data: any): Promise<RegistryResponse> {
         },
       });
 
-      // Create activity
+      // Determine the activity type based on contact status
+      const activityType = contacted ? "PATIENT_CONTACTED" : "REGISTRY_UPDATED";
+      const activityDescription =
+        activityType === "PATIENT_CONTACTED"
+          ? `Contacted patient: ${registry.patient.name}`
+          : `Updated registry for ${registry.patient.name}`;
+
+      // Create new activity based on contact status
       await tx.activity.create({
         data: {
-          type: contacted ? "PATIENT_CONTACTED" : "REGISTRY_UPDATED",
-          description: contacted
-            ? `Contacted patient: ${registry.patient.name}`
-            : `Updated registry for ${registry.patient.name}`,
+          type: activityType,
+          description: activityDescription,
           patientId,
           userId: registeredBy,
         },
