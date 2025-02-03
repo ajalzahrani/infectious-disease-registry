@@ -26,6 +26,9 @@ export default async function PatientProfilePage({
           createdAt: "desc",
         },
         take: 1,
+        include: {
+          comments: true,
+        },
       },
     },
   });
@@ -66,7 +69,10 @@ export default async function PatientProfilePage({
                 initialRegistry={{
                   id: patient.registries[0].id,
                   contacted: patient.registries[0].contacted,
-                  comments: patient.registries[0].comments || undefined,
+                  comments:
+                    patient.registries[0].comments[
+                      patient.registries[0].comments.length - 1
+                    ]?.comment || undefined,
                 }}
               />
             </div>

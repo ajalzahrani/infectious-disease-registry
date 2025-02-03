@@ -29,7 +29,6 @@ type RegistryResponse = {
 };
 
 export async function updateRegistry(data: any): Promise<RegistryResponse> {
-  console.log("Received data:", data); // Debugging line
   try {
     const validatedData = registrySchema.parse(data);
     const { contacted, comments, patientId, registeredBy } = validatedData;
@@ -46,18 +45,44 @@ export async function updateRegistry(data: any): Promise<RegistryResponse> {
         throw new Error("Registry not found");
       }
 
+      if (registry.isClosed) {
+        throw new Error("Cannot update a closed registry");
+      }
+
       // Update the registry
       const updatedRegistry = await tx.registry.update({
         where: { id: registry.id },
         data: {
           contacted,
-          comments,
           contactDate: contacted ? new Date() : null,
           registeredBy: {
             connect: {
               id: registeredBy,
             },
           },
+        },
+      });
+
+      // Add comment if provided
+      if (comments) {
+        await tx.registryComment.create({
+          data: {
+            registryId: registry.id,
+            comment: comments,
+            userId: registeredBy,
+          },
+        });
+      }
+
+      // Create update record
+      await tx.registryUpdate.create({
+        data: {
+          registryId: registry.id,
+          type: contacted ? "CONTACT_STATUS_CHANGED" : "COMMENT_ADDED",
+          userId: registeredBy,
+          details: contacted
+            ? `Contact status updated to ${contacted}`
+            : "New comment added",
         },
       });
 

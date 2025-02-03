@@ -7,6 +7,8 @@ const prisma = new PrismaClient();
 async function main() {
   // Clear existing users
   await prisma.user.deleteMany({});
+  await prisma.patient.deleteMany({});
+  await prisma.disease.deleteMany({});
 
   const users = [
     {
@@ -31,6 +33,44 @@ async function main() {
       role: "INFECTIOUS_DOCTOR",
     },
   ];
+
+  const diseases = [
+    {
+      name: "COVID-19",
+      description:
+        "COVID-19 is a respiratory disease caused by the SARS-CoV-2 virus.",
+    },
+    {
+      name: "Influenza",
+      description:
+        "Influenza is a respiratory disease caused by the influenza virus.",
+    },
+    {
+      name: "Tuberculosis",
+      description:
+        "Tuberculosis is a respiratory disease caused by the tuberculosis bacillus.",
+    },
+    {
+      name: "Malaria",
+      description:
+        "Malaria is a parasitic disease caused by the Plasmodium parasite.",
+    },
+    {
+      name: "Hepatitis",
+      description: "Hepatitis is a viral disease that attacks the liver.",
+    },
+    {
+      name: "Dengue Fever",
+      description:
+        "Dengue Fever is a viral disease caused by the dengue virus.",
+    },
+  ];
+
+  for (const disease of diseases) {
+    await prisma.disease.create({
+      data: disease,
+    });
+  }
 
   for (const user of users) {
     await prisma.user.create({

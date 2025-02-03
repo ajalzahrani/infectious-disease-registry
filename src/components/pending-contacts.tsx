@@ -43,6 +43,14 @@ async function getPendingContacts() {
 export async function PendingContacts() {
   const pendingContacts = await getPendingContacts();
 
+  if (pendingContacts.error) {
+    return (
+      <div className="text-center text-muted-foreground">
+        {pendingContacts.error}
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       {pendingContacts.data &&

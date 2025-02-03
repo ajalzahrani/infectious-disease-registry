@@ -1,6 +1,6 @@
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
@@ -36,14 +36,21 @@ model Registry {
   diseaseId   String
   contacted   Boolean   @default(false)
   contactDate DateTime?
-  comments    String?
+  isClosed    Boolean   @default(false)
+  closedAt    DateTime?
+  closedBy    User?     @relation("ClosedBy", fields: [closedById], references: [id])
+  closedById  String?
   registeredBy User     @relation("RegisteredBy", fields: [userId], references: [id], onDelete: Cascade)
   userId      String
   createdAt   DateTime  @default(now())
+  
+  comments    RegistryComment[]
+  updates     RegistryUpdate[]
 
   @@index([patientId])
   @@index([diseaseId])
   @@index([userId])
+  @@index([closedById])
 }
 
 model Relative {
@@ -55,7 +62,6 @@ model Relative {
   relativeContact String
   createdAt      DateTime @default(now())
 }
-
 
 model Activity {
   id          String    @id @default(cuid())
@@ -85,6 +91,9 @@ model User {
   // Business
   registries   Registry[] @relation("RegisteredBy")
   activites    Activity[]
+  registryUpdates RegistryUpdate[]
+  registryComments RegistryComment[]
+  closedRegistries Registry[]    @relation("ClosedBy")
  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -145,4 +154,39 @@ model Authenticator {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
  
   @@id([userId, credentialID])
+}
+
+model RegistryUpdate {
+  id          String    @id @default(cuid())
+  registry    Registry  @relation(fields: [registryId], references: [id])
+  registryId  String
+  type        UpdateType
+  updatedBy   User      @relation(fields: [userId], references: [id])
+  userId      String
+  details     String?
+  createdAt   DateTime  @default(now())
+
+  @@index([registryId])
+  @@index([userId])
+}
+
+model RegistryComment {
+  id          String    @id @default(cuid())
+  registry    Registry  @relation(fields: [registryId], references: [id])
+  registryId  String
+  comment     String
+  createdBy   User      @relation(fields: [userId], references: [id])
+  userId      String
+  createdAt   DateTime  @default(now())
+
+  @@index([registryId])
+  @@index([userId])
+}
+
+enum UpdateType {
+  CONTACT_STATUS_CHANGED
+  COMMENT_ADDED
+  RELATIVE_ADDED
+  REGISTRY_CLOSED
+  REGISTRY_REOPENED
 }
