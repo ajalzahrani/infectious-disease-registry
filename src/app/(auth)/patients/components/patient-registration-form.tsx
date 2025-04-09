@@ -130,7 +130,7 @@ export function PatientRegistrationForm() {
                 <FormLabel>MRN</FormLabel>
                 <FormControl>
                   <div className="flex gap-2">
-                    <Input {...field} placeholder="Enter MRN" />
+                    <Input {...field} placeholder="Enter MRN" maxLength={10} />
                     <Button
                       type="button"
                       variant="secondary"
@@ -210,7 +210,11 @@ export function PatientRegistrationForm() {
               <FormItem>
                 <FormLabel>Contact Information</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="Phone number or email" />
+                  <Input
+                    {...field}
+                    placeholder="Phone number or email"
+                    maxLength={10}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

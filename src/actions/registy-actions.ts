@@ -37,7 +37,13 @@ export async function updateRegistry(data: any): Promise<RegistryResponse> {
       // Find the most recent registry
       const registry = await tx.registry.findFirst({
         where: { patientId },
-        include: { patient: true },
+        include: {
+          patient: true,
+          comments: {
+            orderBy: { createdAt: "desc" },
+            take: 1,
+          },
+        },
         orderBy: { createdAt: "desc" },
       });
 
@@ -49,12 +55,25 @@ export async function updateRegistry(data: any): Promise<RegistryResponse> {
         throw new Error("Cannot update a closed registry");
       }
 
+      // Check if contact status is actually changing
+      const contactStatusChanged =
+        contacted !== undefined && contacted !== registry.contacted;
+
+      // Check if a comment is actually provided and different from the last comment
+      const lastComment = registry.comments[0]?.comment || "";
+      const newComment = comments || "";
+      const commentChanged =
+        newComment.trim() !== "" && newComment.trim() !== lastComment.trim();
+
       // Update the registry
       const updatedRegistry = await tx.registry.update({
         where: { id: registry.id },
         data: {
           contacted,
-          contactDate: contacted ? new Date() : null,
+          contactDate:
+            contactStatusChanged && contacted
+              ? new Date()
+              : registry.contactDate,
           registeredBy: {
             connect: {
               id: registeredBy,
@@ -63,37 +82,48 @@ export async function updateRegistry(data: any): Promise<RegistryResponse> {
         },
       });
 
-      // Add comment if provided
-      if (comments) {
+      // Add comment if provided and different from the last comment
+      if (commentChanged) {
         await tx.registryComment.create({
           data: {
             registryId: registry.id,
-            comment: comments,
+            comment: newComment,
             userId: registeredBy,
           },
         });
       }
 
-      // Create update record
-      await tx.registryUpdate.create({
-        data: {
-          registryId: registry.id,
-          type: contacted ? "CONTACT_STATUS_CHANGED" : "COMMENT_ADDED",
-          userId: registeredBy,
-          details: contacted
-            ? `Contact status updated to ${contacted}`
-            : "New comment added",
-        },
-      });
+      // Create update record ONLY for contact status changes, not for comments
+      if (contactStatusChanged) {
+        await tx.registryUpdate.create({
+          data: {
+            registryId: registry.id,
+            type: "CONTACT_STATUS_CHANGED",
+            userId: registeredBy,
+            details: `Contact status updated to ${contacted}`,
+          },
+        });
+      }
 
-      // Determine the activity type based on contact status
-      const activityType = contacted ? "PATIENT_CONTACTED" : "REGISTRY_UPDATED";
-      const activityDescription =
-        activityType === "PATIENT_CONTACTED"
-          ? `Contacted patient: ${registry.patient.name}`
-          : `Updated registry for ${registry.patient.name}`;
+      // Determine the activity type based on the actual action performed
+      let activityType:
+        | "PATIENT_CONTACTED"
+        | "COMMENT_ADDED"
+        | "REGISTRY_UPDATED";
+      let activityDescription: string;
 
-      // Create new activity based on contact status
+      if (contactStatusChanged) {
+        activityType = "PATIENT_CONTACTED";
+        activityDescription = `Contacted patient: ${registry.patient.name}`;
+      } else if (commentChanged) {
+        activityType = "COMMENT_ADDED";
+        activityDescription = `Added comment for ${registry.patient.name}`;
+      } else {
+        activityType = "REGISTRY_UPDATED";
+        activityDescription = `Updated registry for ${registry.patient.name}`;
+      }
+
+      // Create new activity with more specific type
       await tx.activity.create({
         data: {
           type: activityType,
@@ -148,5 +178,67 @@ export async function updateRegistry(data: any): Promise<RegistryResponse> {
         error instanceof Error ? error.message : "An unknown error occurred",
       details: error,
     };
+  }
+}
+
+export async function closeRegistry(registryId: string, userId: string) {
+  try {
+    const registry = await prisma.registry.findUnique({
+      where: { id: registryId },
+      include: {
+        patient: true,
+      },
+    });
+
+    if (!registry) {
+      throw new Error("Registry not found");
+    }
+
+    if (registry.isClosed) {
+      throw new Error("Registry is already closed");
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+      // Update the registry to mark it as closed
+      const updatedRegistry = await tx.registry.update({
+        where: { id: registryId },
+        data: {
+          isClosed: true,
+          closedAt: new Date(),
+          closedBy: {
+            connect: {
+              id: userId,
+            },
+          },
+        },
+      });
+
+      // Create a registry update record for closing the registry
+      await tx.registryUpdate.create({
+        data: {
+          registryId: registryId,
+          type: "REGISTRY_CLOSED",
+          userId: userId,
+          details: `Registry closed for patient: ${registry.patient.name}`,
+        },
+      });
+
+      // Create an activity record
+      await tx.activity.create({
+        data: {
+          type: "REGISTRY_CLOSED",
+          description: `Registry closed for patient: ${registry.patient.name}`,
+          patientId: registry.patientId,
+          userId: userId,
+        },
+      });
+
+      return updatedRegistry;
+    });
+
+    return result;
+  } catch (error) {
+    console.error("Error closing registry:", error);
+    throw error;
   }
 }

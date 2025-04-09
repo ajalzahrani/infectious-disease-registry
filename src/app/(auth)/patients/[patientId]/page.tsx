@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { prisma } from "@/lib/prisma";
 import { PatientRegistry } from "@/app/(auth)/registry/components/patient-registry-form";
 import { PatientDiseaseList } from "../components/patient-diease-list";
+import { RegistryUpdates } from "@/app/(auth)/registry/components/registry-updates";
 
 interface PatientProfilePageProps {
   params: {
@@ -27,7 +28,24 @@ export default async function PatientProfilePage({
         },
         take: 1,
         include: {
-          comments: true,
+          comments: {
+            include: {
+              createdBy: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+          updates: {
+            include: {
+              updatedBy: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
         },
       },
     },
@@ -51,6 +69,7 @@ export default async function PatientProfilePage({
             <TabsList>
               <TabsTrigger value="diseases">Diseases</TabsTrigger>
               <TabsTrigger value="relatives">Relatives</TabsTrigger>
+              <TabsTrigger value="updates">Registry Updates</TabsTrigger>
             </TabsList>
             <TabsContent value="diseases">
               <PatientDiseaseList patientId={patient.id} />
@@ -58,9 +77,15 @@ export default async function PatientProfilePage({
             <TabsContent value="relatives">
               <RelativesList patientId={patient.id} />
             </TabsContent>
+            <TabsContent value="updates">
+              <RegistryUpdates
+                updates={patient.registries[0].updates}
+                comments={patient.registries[0].comments}
+              />
+            </TabsContent>
           </Tabs>
         </div>
-        <div>
+        <div className="space-y-6">
           <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">Registry Status</h3>
@@ -69,10 +94,8 @@ export default async function PatientProfilePage({
                 initialRegistry={{
                   id: patient.registries[0].id,
                   contacted: patient.registries[0].contacted,
-                  comments:
-                    patient.registries[0].comments[
-                      patient.registries[0].comments.length - 1
-                    ]?.comment || undefined,
+                  isClosed: patient.registries[0].isClosed,
+                  comments: patient.registries[0].comments[0]?.comment,
                 }}
               />
             </div>

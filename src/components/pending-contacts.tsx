@@ -9,6 +9,7 @@ async function getPendingContacts() {
       data: await prisma.registry.findMany({
         where: {
           contacted: false,
+          isClosed: false,
         },
         take: 5,
         orderBy: {
@@ -20,11 +21,6 @@ async function getPendingContacts() {
               id: true,
               name: true,
               contactInfo: true,
-            },
-          },
-          disease: {
-            select: {
-              name: true,
             },
           },
         },
@@ -58,9 +54,9 @@ export async function PendingContacts() {
           <div key={contact.id} className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium">{contact.patient.name}</p>
-              <p className="text-sm text-muted-foreground">
+              {/* <p className="text-sm text-muted-foreground">
                 {contact.disease.name}
-              </p>
+              </p> */}
               <p className="text-xs text-muted-foreground">
                 Due:{" "}
                 {formatDistanceToNow(contact.createdAt, { addSuffix: true })}
