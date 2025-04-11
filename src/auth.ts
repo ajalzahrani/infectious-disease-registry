@@ -6,6 +6,11 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import type { NextAuthConfig } from "next-auth";
 import type { Adapter } from "next-auth/adapters";
 
+// Add this near the top of your file, after the imports
+const trustHosts =
+  process.env.NEXTAUTH_URL ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null);
+
 // Define auth config
 export const config = {
   adapter: PrismaAdapter(prisma) as Adapter,
@@ -65,6 +70,9 @@ export const config = {
       return session;
     },
   },
+
+  // Add this to trust localhost in development
+  trustHost: !!trustHosts || process.env.NODE_ENV !== "production",
 } satisfies NextAuthConfig;
 
 // Create the auth handlers and helpers
