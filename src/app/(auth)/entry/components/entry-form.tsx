@@ -26,7 +26,7 @@ import * as z from "zod";
 import { toast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { useSession } from "next-auth/react";
-
+import { PatientData } from "@/actions/patients-actions";
 const patientSchema = z.object({
   mrn: z.string().min(1, "MRN is required"),
   name: z.string().min(1, "Name is required"),
@@ -77,7 +77,7 @@ export function EntryForm() {
           variant: "destructive",
         });
       }
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to fetch patient details.",
@@ -100,7 +100,7 @@ export function EntryForm() {
         registeredBy: session?.user?.id,
       };
 
-      createPatient(patientData);
+      createPatient(patientData as PatientData);
 
       toast({
         title: "Success",

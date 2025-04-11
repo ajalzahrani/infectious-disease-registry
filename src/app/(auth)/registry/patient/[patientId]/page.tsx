@@ -3,18 +3,16 @@ import { RelativesList } from "@/app/(auth)/registry/patient/components/relative
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { prisma } from "@/lib/prisma";
 import { PatientRegistry } from "@/app/(auth)/registry/patient/components/patient-registry-form";
-import { PatientDiseaseList } from "../components/patient-diease-list";
+import { PatientDiseaseList } from "@/app/(auth)/registry/patient/components/patient-diease-list";
 import { RegistryUpdates } from "@/app/(auth)/registry/patient/components/registry-updates";
 
-interface PatientProfilePageProps {
-  params: {
+interface PageProps {
+  params: Promise<{
     patientId: string;
-  };
+  }>;
 }
 
-export default async function PatientProfilePage({
-  params,
-}: PatientProfilePageProps) {
+export default async function PatientProfilePage({ params }: PageProps) {
   const { patientId } = await params;
 
   const patient = await prisma.patient.findUnique({

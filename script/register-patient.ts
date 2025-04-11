@@ -37,7 +37,7 @@ async function registerPatient(): Promise<void> {
       gender: "MALE",
       contactInfo: randomizePhone(),
       diseases: diseasesToRegister.map((disease) => disease.id),
-      registeredBy: registeredBy?.id,
+      registeredBy: registeredBy?.id ?? "",
       mrn: randomizeMRN(),
     });
 

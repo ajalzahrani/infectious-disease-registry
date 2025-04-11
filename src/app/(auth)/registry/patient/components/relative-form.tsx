@@ -32,7 +32,7 @@ interface RelativeFormProps {
 
 export function RelativeForm({ patientId, onCancel }: RelativeFormProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const { createRelative, isLoadingCreateRelative } = usePatients();
+  const { createRelative } = usePatients();
   const form = useForm<RelativeFormValues>({
     resolver: zodResolver(relativeSchema),
     defaultValues: {

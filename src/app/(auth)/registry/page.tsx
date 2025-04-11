@@ -1,4 +1,3 @@
-import { prisma } from "@/lib/prisma";
 import { RegistryClientWrapper } from "@/app/(auth)/registry/components/registry-client-wrapper";
 import { getTodayRegistryPatients } from "@/actions/patients-actions";
 

@@ -4,31 +4,42 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
 
-const registrySchema = z
-  .object({
-    patientId: z.string().min(1, "Patient ID is required"),
-    contacted: z.boolean().optional(),
-    comments: z.string().optional(),
-    registeredBy: z.string().min(1, "Registered By is required"),
-  })
-  .refine(
-    (data) => {
-      // Add custom validation if needed
-      return true;
-    },
-    {
-      message: "Custom validation failed",
-    }
-  );
+const registrySchema = z.object({
+  patientId: z.string().min(1, "Patient ID is required"),
+  contacted: z.boolean().optional(),
+  comments: z.string().optional(),
+  registeredBy: z.string().min(1, "Registered By is required"),
+});
 
 type RegistryResponse = {
   success: boolean;
-  data?: any; // Replace 'any' with your specific type
+  data?: {
+    patientId: string;
+    contacted: boolean;
+    id: string;
+    diseaseId: string;
+    contactDate: Date | null;
+    isClosed: boolean;
+    closedAt: Date | null;
+    closedById: string | null;
+    userId: string;
+    createdAt: Date;
+  };
   error?: string;
   details?: unknown;
 };
 
-export async function updateRegistry(data: any): Promise<RegistryResponse> {
+// Define a type for the partial registry data that can be passed to updateRegistry
+type RegistryUpdateData = {
+  patientId: string;
+  registeredBy: string;
+  contacted?: boolean;
+  comments?: string;
+};
+
+export async function updateRegistry(
+  data: RegistryUpdateData
+): Promise<RegistryResponse> {
   try {
     const validatedData = registrySchema.parse(data);
     const { contacted, comments, patientId, registeredBy } = validatedData;

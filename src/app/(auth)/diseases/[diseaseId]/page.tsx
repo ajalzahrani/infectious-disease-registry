@@ -1,5 +1,4 @@
-import { Suspense } from "react";
-import { EditDiseaseForm } from "../components/edit-disease-form";
+import { EditDiseaseForm } from "@/app/(auth)/diseases/components/edit-disease-form";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";

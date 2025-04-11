@@ -2,77 +2,70 @@ import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
-import Credentials from "next-auth/providers/credentials";
+import CredentialsProvider from "next-auth/providers/credentials";
+import type { NextAuthConfig } from "next-auth";
+import type { Adapter } from "next-auth/adapters";
 
-const getUserFromDb = async (username: string) => {
-  const user = await prisma.user.findUnique({
-    where: { username },
-  });
-  if (!user) {
-    return null;
-  }
-  return user;
-};
-
-export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(prisma),
-  debug: true,
+// Define auth config
+export const config = {
+  adapter: PrismaAdapter(prisma) as Adapter,
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
   },
   providers: [
-    Credentials({
+    CredentialsProvider({
       credentials: {
         username: { label: "Username", type: "text" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        try {
-          if (!credentials?.username || !credentials?.password) {
-            throw new Error("Missing credentials");
-          }
-
-          const username = credentials.username as string;
-
-          // First get the user
-          const user = await getUserFromDb(username);
-
-          if (!user || !user.password) {
-            throw new Error("Invalid credentials");
-          }
-
-          // Compare the provided password with stored hash
-          const isPasswordValid = await bcrypt.compare(
-            credentials.password,
-            user.password
-          );
-
-          if (!isPasswordValid) {
-            throw new Error("Invalid credentials");
-          }
-
-          // Return user without password
-          const { password: _, ...userWithoutPassword } = user;
-          return userWithoutPassword;
-        } catch (error) {
-          throw error;
+        if (!credentials?.username || !credentials?.password) {
+          return null;
         }
+
+        const user = await prisma.user.findUnique({
+          where: { username: credentials.username as string },
+        });
+
+        if (!user || !user.password) {
+          return null;
+        }
+
+        const isPasswordValid = await bcrypt.compare(
+          credentials.password as string,
+          user.password
+        );
+
+        if (!isPasswordValid) {
+          return null;
+        }
+
+        // Return user without password
+        const { ...userWithoutPassword } = user;
+        return userWithoutPassword;
       },
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    jwt({ token, user }) {
       if (user) {
-        token.user = user;
+        token.id = user.id;
+        token.username = user.username;
+        token.role = user.role;
       }
       return token;
     },
-    async session({ session, token }) {
-      if (token?.user) {
-        session.user = token.user;
+    session({ session, token }) {
+      if (token) {
+        session.user.id = token.id as string;
+        session.user.username = token.username as string;
+        session.user.role = token.role as string;
       }
       return session;
     },
   },
-});
+} satisfies NextAuthConfig;
+
+// Create the auth handlers and helpers
+export const { handlers, auth, signIn, signOut } = NextAuth(config);

@@ -14,8 +14,15 @@ import {
 import { DatePickerWithRange } from "@/components/date-range-picker";
 import { useDiseases } from "@/app/(auth)/diseases/hooks/use-diseases";
 
+interface RegistryFilters {
+  mrn: string;
+  disease: string;
+  status: string;
+  dateRange: { from: Date | undefined; to: Date | undefined };
+}
+
 interface RegistryFiltersProps {
-  onFilter: (filters: any) => void;
+  onFilter: (filters: RegistryFilters) => void;
 }
 
 export function RegistryFilters({ onFilter }: RegistryFiltersProps) {

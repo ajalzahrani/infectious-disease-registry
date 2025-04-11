@@ -2,11 +2,6 @@
 import { prisma } from "@/lib/prisma";
 import { Disease } from "@prisma/client";
 
-interface DiseaseOption {
-  value: string;
-  label: string;
-}
-
 export async function getDiseasesOptions(): Promise<Partial<Disease>[]> {
   // Replace this with your actual database query
   const diseases = await prisma.disease.findMany({

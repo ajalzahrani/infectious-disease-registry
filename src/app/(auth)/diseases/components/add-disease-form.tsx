@@ -23,7 +23,7 @@ export function AddDiseaseForm() {
         description: "Disease has been added successfully.",
       });
       (event.target as HTMLFormElement).reset();
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to add disease. Please try again.",

@@ -13,7 +13,16 @@ import { Eye } from "lucide-react";
 import Link from "next/link";
 
 interface RegistryListProps {
-  patients: any[]; // Replace 'any' with your Patient type
+  patients: {
+    id: string;
+    name: string;
+    mrn: string;
+    registries: {
+      disease: { name: string };
+      createdAt: Date;
+      contacted: boolean;
+    }[];
+  }[];
 }
 
 export function RegistryList({ patients }: RegistryListProps) {

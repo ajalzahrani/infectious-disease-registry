@@ -36,7 +36,9 @@ export async function getPatients() {
   }
 }
 
-export async function createPatient(data: any) {
+export type PatientData = z.infer<typeof patientSchema>;
+
+export async function createPatient(data: PatientData) {
   try {
     // Validate the input data
     const validatedData = patientSchema.parse(data);

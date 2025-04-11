@@ -5,8 +5,6 @@ import {
   getDiseases,
   createDisease,
   updateDisease,
-  deleteDisease,
-  getDiseaseById,
   getDiseasesOptions,
 } from "@/actions/diseases-actions";
 
@@ -42,7 +40,7 @@ export function useDiseases() {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["diseases"] });
       },
-      onError: (error) => {
+      onError: () => {
         toast({
           title: "Error",
           description: "Failed to add disease. Please try again.",

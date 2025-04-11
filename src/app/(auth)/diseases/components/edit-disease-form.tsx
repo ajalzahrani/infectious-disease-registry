@@ -20,15 +20,12 @@ interface FormData {
 export function EditDiseaseForm({ diseaseId }: { diseaseId: string }) {
   const router = useRouter();
   const { updateDisease, isLoadingUpdateDisease } = useDiseases();
-  const {
-    data: disease,
-    isLoading: isLoadingDisease,
-    error: errorDisease,
-  } = useQuery<Disease | null>({
-    queryKey: ["disease", diseaseId],
-    queryFn: () => getDiseaseById(diseaseId),
-    enabled: !!diseaseId, // Only run the query if diseaseId is truthy
-  });
+  const { data: disease, isLoading: isLoadingDisease } =
+    useQuery<Disease | null>({
+      queryKey: ["disease", diseaseId],
+      queryFn: () => getDiseaseById(diseaseId),
+      enabled: !!diseaseId, // Only run the query if diseaseId is truthy
+    });
 
   const { register, handleSubmit, reset } = useForm<FormData>({
     defaultValues: {
@@ -55,7 +52,7 @@ export function EditDiseaseForm({ diseaseId }: { diseaseId: string }) {
         description: "Disease has been updated successfully.",
       });
       router.push("/diseases");
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to update disease. Please try again.",

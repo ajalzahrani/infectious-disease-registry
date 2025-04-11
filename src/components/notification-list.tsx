@@ -6,7 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Bell, Calendar, User } from "lucide-react";
+import { Bell } from "lucide-react";
 
 const notifications = [
   {

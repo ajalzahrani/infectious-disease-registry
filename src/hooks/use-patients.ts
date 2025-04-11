@@ -1,16 +1,17 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Patient, Relative } from "@prisma/client";
+import { Patient, Relative, Registry } from "@prisma/client";
 import { toast } from "@/hooks/use-toast";
 import {
   createPatient,
   getPatients,
+  PatientData,
   updatePatient,
 } from "@/actions/patients-actions";
-import { createRelative, getRelatives } from "@/actions/relatives-actions";
+import { createRelative } from "@/actions/relatives-actions";
 
 interface PatientWithRelations extends Patient {
-  registries: any[];
-  relatives: any[];
+  registries: Registry[];
+  relatives: Relative[];
 }
 
 export function usePatients() {
@@ -33,7 +34,7 @@ export function usePatients() {
 
   const { mutate: createPatientMutation, isPending: isLoadingCreatePatient } =
     useMutation({
-      mutationFn: async (newPatient: Partial<Patient>) => {
+      mutationFn: async (newPatient: PatientData) => {
         const response = await createPatient(newPatient);
         if (!response.success) {
           throw new Error(response.error || "Failed to create patient");
