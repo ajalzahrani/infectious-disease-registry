@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { auth } from "@/auth";
 
 export async function PUT(
   request: Request,
@@ -7,6 +8,11 @@ export async function PUT(
 ) {
   const params = await props.params;
   try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { contacted, comments } = await request.json();
     const patientId = params.patientId;
 
@@ -27,10 +33,25 @@ export async function PUT(
         where: { id: registry.id },
         data: {
           contacted,
-          comments,
           contactDate: contacted ? new Date() : null,
+          registeredBy: {
+            connect: {
+              id: session.user.id,
+            },
+          },
         },
       });
+
+      // Add comment if provided
+      if (comments && comments.trim().length > 0) {
+        await tx.registryComment.create({
+          data: {
+            registryId: registry.id,
+            comment: comments,
+            userId: session.user.id,
+          },
+        });
+      }
 
       // Create activity
       await tx.activity.create({
@@ -40,7 +61,7 @@ export async function PUT(
             ? `Contacted patient: ${registry.patient.name}`
             : `Updated registry for ${registry.patient.name}`,
           patientId,
-          userId: "1", // Replace with actual user ID from auth
+          userId: session.user.id,
         },
       });
 

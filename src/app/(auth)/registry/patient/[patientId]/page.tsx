@@ -2,9 +2,9 @@ import { PatientInfo } from "@/app/(auth)/registry/patient/components/patient-in
 import { RelativesList } from "@/app/(auth)/registry/patient/components/relatives-list";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { prisma } from "@/lib/prisma";
-import { PatientRegistry } from "@/app/(auth)/registry/components/patient-registry-form";
+import { PatientRegistry } from "@/app/(auth)/registry/patient/components/patient-registry-form";
 import { PatientDiseaseList } from "../components/patient-diease-list";
-import { RegistryUpdates } from "@/app/(auth)/registry/components/registry-updates";
+import { RegistryUpdates } from "@/app/(auth)/registry/patient/components/registry-updates";
 
 interface PatientProfilePageProps {
   params: {

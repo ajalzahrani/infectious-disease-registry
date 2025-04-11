@@ -47,9 +47,7 @@ export async function PatientInfo({ patientId }: PatientInfoProps) {
           </div>
           <div>
             <p className="text-sm font-medium">Address</p>
-            <p className="text-sm text-muted-foreground">
-              {patient.address || "N/A"}
-            </p>
+            <p className="text-sm text-muted-foreground">{"N/A"}</p>
           </div>
         </div>
       </CardContent>

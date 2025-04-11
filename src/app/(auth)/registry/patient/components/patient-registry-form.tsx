@@ -35,11 +35,11 @@ export function PatientRegistry({
   const {
     control,
     handleSubmit,
+    reset,
     formState: { isSubmitting },
   } = useForm<FormData>({
     defaultValues: {
       contacted: initialRegistry?.contacted || false,
-      comments: initialRegistry?.comments || "",
     },
   });
 
@@ -73,6 +73,12 @@ export function PatientRegistry({
       if (!response.success) {
         throw new Error(response.error || "Failed to update registry");
       }
+
+      // Reset the form after successful submission
+      reset({
+        contacted: data.contacted, // Keep the contact status
+        comments: "", // Clear the comments
+      });
 
       toast({
         title: "Success",
