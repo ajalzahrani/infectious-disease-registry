@@ -3,10 +3,11 @@ export const rolePermissions = {
     allowed: [
       "/",
       "/dashboard",
-      "/patients",
+      "/entry",
       "/diseases",
       "/registry",
       "/notifications",
+      "/patients",
     ],
     denied: [],
     navItems: [
@@ -16,8 +17,8 @@ export const rolePermissions = {
         icon: "Home",
       },
       {
-        title: "Register Patient",
-        href: "/patients/register",
+        title: "Entry",
+        href: "/entry",
         icon: "FileText",
       },
       {
@@ -38,7 +39,7 @@ export const rolePermissions = {
     ],
   },
   LAB_DOCTOR: {
-    allowed: ["/", "/dashboard", "/patients/register"],
+    allowed: ["/", "/dashboard", "/entry"],
     denied: ["/diseases", "/registry", "/notifications"],
     navItems: [
       {
@@ -47,15 +48,15 @@ export const rolePermissions = {
         icon: "Home",
       },
       {
-        title: "Register Patient",
-        href: "/patients/register",
+        title: "Entry",
+        href: "/entry",
         icon: "FileText",
       },
     ],
   },
   INFECTIOUS_DOCTOR: {
     allowed: ["/", "/dashboard", "/diseases", "/registry", "/notifications"],
-    denied: ["/patients/register"],
+    denied: ["/entry"],
     navItems: [
       {
         title: "Dashboard",

@@ -38,7 +38,7 @@ const patientSchema = z.object({
 
 type PatientFormValues = z.infer<typeof patientSchema>;
 
-export function PatientRegistrationForm() {
+export function EntryForm() {
   const [isFetchingMRN, setIsFetchingMRN] = useState(false);
   const { createPatient, isLoadingCreatePatient } = usePatients();
   const { diseasesOptions } = useDiseases();
@@ -241,7 +241,7 @@ export function PatientRegistrationForm() {
                   </SelectTrigger>
                   <SelectContent>
                     {diseasesOptions?.map((disease) => (
-                      <SelectItem key={disease.id} value={disease.id}>
+                      <SelectItem key={disease.id} value={disease.id || ""}>
                         {disease.name}
                       </SelectItem>
                     ))}

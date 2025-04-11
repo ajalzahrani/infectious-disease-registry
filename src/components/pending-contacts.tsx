@@ -63,7 +63,7 @@ export async function PendingContacts() {
               </p>
             </div>
             <Button asChild size="sm" variant="outline">
-              <a href={`/patients/${contact.patient.id}`}>
+              <a href={`/registry/patient/${contact.patient.id}`}>
                 <Phone className="h-4 w-4 mr-2" />
                 Contact
               </a>

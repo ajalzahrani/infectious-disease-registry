@@ -46,7 +46,7 @@ export function RegistryList({ patients }: RegistryListProps) {
               </TableCell>
               <TableCell>
                 <Button asChild size="sm" variant="ghost">
-                  <Link href={`/patients/${patient.id}`}>
+                  <Link href={`/registry/patient/${patient.id}`}>
                     <Eye className="mr-2 h-4 w-4" />
                     View
                   </Link>
